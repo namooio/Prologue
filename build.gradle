@@ -1,0 +1,106 @@
+plugins {
+    id 'maven'
+    id 'com.google.protobuf' version '0.8.10'
+    id 'idea'
+}
+
+apply plugin: "java"
+apply plugin: "maven-publish"
+
+ext {
+    accentVersion = "0.6.0-SNAPSHOT"
+    lombokVersion = "1.18.10"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'io.naraplatform'
+version = accentVersion
+
+def nexusBaseUrl = "http://58.225.16.61:10001/repository/"
+
+repositories {
+    maven {
+        credentials {
+            username = System.getenv("NEXUS_ID")
+            password = System.getenv("NEXUS_PASSWORD")
+        }
+        url "http://58.225.16.61:10001/repository/nara-public/"
+    }
+
+    mavenLocal()
+
+    mavenCentral()
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.10.0"
+    }
+    plugins {
+        grpc {
+            artifact = 'io.grpc:protoc-gen-grpc-java:1.24.0'
+        }
+    }
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}
+
+dependencies {
+    compile "org.apache.commons:commons-lang3:3.4"
+    compile "commons-io:commons-io:2.5"
+    compile "com.google.code.gson:gson:2.8.0"
+    compile "org.mindrot:jbcrypt:0.3m"
+    compile "commons-beanutils:commons-beanutils:1.8.3"
+    compile 'com.fatboyindustrial.gson-javatime-serialisers:gson-javatime-serialisers:1.1.1'
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    compile "javax.persistence:javax.persistence-api:2.2"
+
+    implementation 'io.grpc:grpc-netty-shaded:1.24.0'
+    implementation 'io.grpc:grpc-protobuf:1.24.0'
+    implementation 'io.grpc:grpc-stub:1.24.0'
+}
+
+sourceSets.main.java.srcDir new File(buildDir, 'generated/source')
+idea {
+    module {
+        // Marks the already(!) added srcDir as "generated"
+        generatedSourceDirs += file('build/generated/source')
+    }
+}
+
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId group
+            artifactId "accent"
+            version version
+
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username = System.getenv("NEXUS_ID")
+                password = System.getenv("NEXUS_PASSWORD")
+            }
+
+            def releasesRepoUrl = nexusBaseUrl + "nara-releases"
+            def snapshotsRepoUrl = nexusBaseUrl + "nara-snapshots"
+
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+        }
+    }
+}
