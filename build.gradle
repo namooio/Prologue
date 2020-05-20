@@ -8,15 +8,15 @@ apply plugin: "java"
 apply plugin: "maven-publish"
 
 ext {
-    accentVersion = "0.6.0-SNAPSHOT"
+    prologueVersion = "1.0.0-SNAPSHOT"
     lombokVersion = "1.18.10"
 }
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group = 'io.naraplatform'
-version = accentVersion
+group = 'io.namoo'
+version = prologueVersion
 
 def nexusBaseUrl = "http://58.225.16.61:10001/repository/"
 
@@ -30,7 +30,6 @@ repositories {
     }
 
     mavenLocal()
-
     mavenCentral()
 }
 
@@ -67,13 +66,13 @@ dependencies {
 }
 
 sourceSets.main.java.srcDir new File(buildDir, 'generated/source')
+
 idea {
     module {
         // Marks the already(!) added srcDir as "generated"
         generatedSourceDirs += file('build/generated/source')
     }
 }
-
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, "seconds"
@@ -83,7 +82,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             groupId group
-            artifactId "accent"
+            artifactId "prologue"
             version version
 
             from components.java
