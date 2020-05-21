@@ -6,7 +6,6 @@
 
 package io.namoo.prologue.ddd;
 
-
 import io.namoo.prologue.util.json.JsonSerializable;
 
 public interface ValueObject extends JsonSerializable {
