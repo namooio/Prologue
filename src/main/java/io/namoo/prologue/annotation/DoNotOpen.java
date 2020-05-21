@@ -4,7 +4,7 @@
  * @since 2014. 6. 10.
  */
 
-package io.namoo.prologue.type;
+package io.namoo.prologue.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -46,17 +46,12 @@ public class OrderedOffset implements JsonSerializable {
         return new OrderedOffset(0, 10, sortKey);
     }
 
-    public static OrderedOffset newOne(int offset,
-                                                                    int limit,
-                                                                    String sortKey) {
+    public static OrderedOffset newInstance(int offset, int limit, String sortKey) {
         //
         return new OrderedOffset(offset, limit, sortKey);
     }
 
-    public static OrderedOffset newOne(int offset,
-                                                                    int limit,
-                                                                    String sortKey,
-                                                                    boolean descending) {
+    public static OrderedOffset newInstance(int offset, int limit, String sortKey, boolean descending) {
         //
         return new OrderedOffset(offset, limit, sortKey, descending);
     }
@@ -96,7 +91,7 @@ public class OrderedOffset implements JsonSerializable {
         return (offset/limit);
     }
 
-    public int sum() {
+    public int nextOffsetValue() {
         //
         return offset + limit;
     }
@@ -109,6 +104,11 @@ public class OrderedOffset implements JsonSerializable {
     public boolean descending() {
         //
         return descending;
+    }
+
+    public OrderedOffset next() {
+        //
+        return new OrderedOffset(nextOffsetValue(), limit, sortKey, descending);
     }
 
     public static void main(String[] args) {

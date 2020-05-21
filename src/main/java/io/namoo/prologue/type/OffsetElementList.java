@@ -25,7 +25,7 @@ import java.util.List;
  * </pre>
  *
  * @param <T> obj
- * @author <a href="mailto:hyunohkim@nextree.co.kr">Kim, Hyunoh</a>
+ * @author Kim, Hyunoh
  * @since 2015. 7. 29.
  */
 public class OffsetElementList<T> implements Iterable<T>, Serializable {

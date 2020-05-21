@@ -51,18 +51,23 @@ public class CodeNameMap implements JsonSerializable {
 		return JsonUtil.fromJson(json, CodeNameMap.class);
 	}
 
+	public String get(String targetCode) {
+		//
+		return codeNameMap.get(targetCode);
+	}
+
 	public static CodeNameMap sample() {
 	    //
         return new CodeNameMap(CodeName.sample());
     }
 
-	public CodeNameMap add(CodeName codeName) {
+	public CodeNameMap put(CodeName codeName) {
 		//
 		codeNameMap.put(codeName.getCode(), codeName.getName());
 		return this;
 	}
 
-	public CodeNameMap add(String code, String name) {
+	public CodeNameMap put(String code, String name) {
 		//
 		codeNameMap.put(code, name);
 		return this;
@@ -77,7 +82,7 @@ public class CodeNameMap implements JsonSerializable {
 
 	public List<CodeName> list() {
 		//
-		List<CodeName> codeNames = new ArrayList<>();
+		List<CodeName> codeNames = new ArrayList<>(codeNameMap.size());
 		Iterator<String> keyIterator = codeNameMap.keySet().iterator();
 		while(keyIterator.hasNext()) {
 			String key = keyIterator.next();
@@ -87,9 +92,9 @@ public class CodeNameMap implements JsonSerializable {
 		return codeNames;
 	}
 
-	public void removeByCode(String code) {
+	public void removeByCode(String targetCode) {
 		//
-		codeNameMap.remove(code);
+		codeNameMap.remove(targetCode);
 	}
 
 	public int size() {

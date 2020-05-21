@@ -27,6 +27,16 @@ public class RowColumnIndex implements JsonSerializable {
         return toJson();
     }
 
+    public RowColumnIndex nextRow() {
+        //
+        return new RowColumnIndex(rowIndex + 1, columnIndex);
+    }
+
+    public RowColumnIndex nextColumn() {
+        //
+        return new RowColumnIndex(rowIndex, columnIndex + 1);
+    }
+
     public boolean isValid() {
         //
         return rowIndex >= 0 && columnIndex >= 0;

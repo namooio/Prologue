@@ -20,8 +20,8 @@ import java.util.StringTokenizer;
 @NoArgsConstructor
 public class IntPair implements JsonSerializable, Serializable {
     //
-    private static final long serialVersionUID = 7064327073572573418L;
     private static final String PAIR_TOKEN = ":";
+
     private int left;
     private int right;
 
@@ -77,6 +77,11 @@ public class IntPair implements JsonSerializable, Serializable {
     public void decreaseRight() {
         //
         right--;
+    }
+
+    public int gap() {
+        //
+        return right - left;
     }
 
     public static void main(String[] args) {

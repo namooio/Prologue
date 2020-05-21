@@ -44,13 +44,24 @@ public class CodeNameList implements JsonSerializable {
 
 	public CodeNameList(List<CodeName> codeNames) {
 		//
-		this.codeNames = codeNames;
+		this();
+		this.codeNames.addAll(codeNames);
 	}
 
 	@Override
 	public String toString() {
 		//
 		return toJson();
+	}
+
+	public static CodeNameList newInstance(String code, String name) {
+		//
+		return new CodeNameList(code, name);
+	}
+
+	public static CodeNameList newInstance(CodeName codeName) {
+		//
+		return new CodeNameList(codeName);
 	}
 
 	public static CodeNameList fromJson(String json) {
@@ -66,14 +77,12 @@ public class CodeNameList implements JsonSerializable {
 	public CodeNameList add(CodeName codeName) {
 		//
 		codeNames.add(codeName);
-
 		return this;
 	}
 
 	public CodeNameList add(String code, String name) {
 		//
 		codeNames.add(new CodeName(code, name));
-
 		return this;
 	}
 
@@ -87,18 +96,18 @@ public class CodeNameList implements JsonSerializable {
 		return codeNames;
 	}
 
-	public void removeByCode(String id) {
+	public void removeByCode(String targetCode) {
 		//
-		for(CodeName codeName : getByCode(id)) {
+		for(CodeName codeName : getByCode(targetCode)) {
 			codeNames.remove(codeName);
 		}
 	}
 
-	public List<CodeName> getByCode(String id) {
+	public List<CodeName> getByCode(String targetCode) {
 		//
 		List<CodeName> foundIdNames = new ArrayList<>();
 		for(CodeName codeName : codeNames) {
-			if(codeName.getCode().equals(id)) {
+			if(codeName.getCode().equals(targetCode)) {
 				foundIdNames.add(codeName);
 			}
 		}
@@ -113,5 +122,6 @@ public class CodeNameList implements JsonSerializable {
     public static void main(String[] args) {
         //
         System.out.println(sample());
+        System.out.println(sample().toPrettyJson());
     }
 }

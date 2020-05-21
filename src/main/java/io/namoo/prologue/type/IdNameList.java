@@ -50,6 +50,16 @@ public class IdNameList implements JsonSerializable, Serializable {
 		this.idNames = idNames;
 	}
 
+	public static IdNameList newInstance(String id, String name) {
+		//
+		return new IdNameList(id, name);
+	}
+
+	public static IdNameList newInstance(IdName idName) {
+		//
+		return new IdNameList(idName);
+	}
+
 	@Override
 	public String toString() {
 		//
@@ -69,14 +79,12 @@ public class IdNameList implements JsonSerializable, Serializable {
 	public IdNameList add(IdName idName) {
 		//
 		idNames.add(idName);
-
 		return this;
 	}
 
 	public IdNameList add(String id, String name) {
 		//
 		idNames.add(new IdName(id, name));
-
 		return this;
 	}
 

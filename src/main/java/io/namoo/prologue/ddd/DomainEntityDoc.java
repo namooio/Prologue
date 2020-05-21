@@ -18,7 +18,6 @@ import java.util.Objects;
 public abstract class DomainEntityDoc implements JsonSerializable {
     //
     protected String id;
-
     protected long entityVersion;
 
     protected DomainEntityDoc(String id) {
@@ -46,6 +45,15 @@ public abstract class DomainEntityDoc implements JsonSerializable {
         }
     }
 
+    public boolean equalsVersion(DomainEntityDoc domainEntityDoc) {
+        //
+        if(!equals(domainEntityDoc)) {
+            return false;
+        }
+
+        return Objects.equals(this.entityVersion, domainEntityDoc.entityVersion);
+    }
+
     @Override
     public int hashCode() {
         //
@@ -55,5 +63,10 @@ public abstract class DomainEntityDoc implements JsonSerializable {
     public String toString(){
         //
         return toJson();
+    }
+
+    public String toPrettyString() {
+        //
+        return toPrettyJson();
     }
 }

@@ -6,7 +6,6 @@
 
 package io.namoo.prologue.util.object;
 
-import io.namoo.prologue.util.exception.NaraException;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.apache.commons.beanutils.PropertyUtilsBean;
 
@@ -15,7 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public class ObjectDiffer {
-	
+	//
 	private PropertyUtilsBean propertyBean;
 	private Object object1;
 	private Object object2;
@@ -35,13 +34,7 @@ public class ObjectDiffer {
 		this(object1, object2);
 		this.properties = properties;
 	}
-	
-	/**
-	 * setter
-     *
-     * @param object1 different first object
-     * @param object2 different second object
-	 */
+
 	public void setObjects(Object object1, Object object2) {
 		this.object1 = object1;
 		this.object2 = object2;
@@ -58,157 +51,133 @@ public class ObjectDiffer {
 		properties.add(property);
 	}
 
-	public boolean hasDifference()  {
-		try {
-			if (object1 == null || object2 == null){
-				throw new IllegalArgumentException("The object must not be null");
-			}
-			
-			if (object1.getClass()  != object2.getClass()){
-				throw new IllegalArgumentException("The objects type must same");
-			}
-			
-			if (isPrimitive(object1)) 
-				throw new IllegalArgumentException("The objects type must not be primitive");
-
-			if (properties == null || properties.isEmpty()) {
-				return isDifferentObjects(object1, object2);
-			}
-
-			else {
-				PropertyDescriptor[] targetPds = propertyBean.getPropertyDescriptors(object1.getClass());
-				for (PropertyDescriptor desc : targetPds) {
-					if (desc.getName().equals("class") || desc.getName().equals("declaringClass"))
-						continue;
-					for (String property : properties) {
-						if (property.equals(desc.getName())) {
-							Object objectValue1 = propertyBean.getProperty(object1, property);
-							Object objectValue2 = propertyBean.getProperty(object2, property);
-							
-							if (isDifferentObjects(objectValue1, objectValue2)) {
-								return true;
-							}
-						}
-					}
-				}
-				return false;
-			}
+	public boolean hasDifference() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		//
+		if (object1 == null || object2 == null){
+			throw new IllegalArgumentException("The object must not be null");
 		}
-		catch (IllegalAccessException e) {
-			throw new NaraException("ObjectDiffer failed with: " + e.getMessage());
-		} catch (InvocationTargetException e) {
-			throw new NaraException("ObjectDiffer failed with: " + e.getMessage());
-		} catch (NoSuchMethodException e) {
-			throw new NaraException("ObjectDiffer failed with: " + e.getMessage());
-		} 
-	}
 
-	public List<String> getDifferences() {
-		try {
-			List<String> differentPropertyList = new ArrayList<String>();
-			
-			if (object1 == null || object2 == null)
-				throw new IllegalArgumentException("The object must not be null");
-			
-			if (object1.getClass()  != object2.getClass())
-				throw new IllegalArgumentException("The objects type must same");
-			
-			if (isPrimitive(object1)) 
-				throw new IllegalArgumentException("The objects type must not be primitive");
-			
+		if (object1.getClass()  != object2.getClass()){
+			throw new IllegalArgumentException("The objects type must same");
+		}
+
+		if (isPrimitive(object1))
+			throw new IllegalArgumentException("The objects type must not be primitive");
+
+		if (properties == null || properties.isEmpty()) {
+			return isDifferentObjects(object1, object2);
+		}
+
+		else {
 			PropertyDescriptor[] targetPds = propertyBean.getPropertyDescriptors(object1.getClass());
-			
 			for (PropertyDescriptor desc : targetPds) {
 				if (desc.getName().equals("class") || desc.getName().equals("declaringClass"))
 					continue;
-				//ã�����ϴ� property�� ���ξ�����
-				if (properties == null || properties.isEmpty()) {
-					Object objectValue1 = propertyBean.getProperty(object1, desc.getName());
-					Object objectValue2 = propertyBean.getProperty(object2, desc.getName());
-					
-					if (isDifferentObjects(objectValue1, objectValue2)) {
-						differentPropertyList.add(desc.getName());
-					}
-				}
-				// ���� ������
-				else {
-					for (String property : properties) {
-						if (property.equals(desc.getName())) {
-							Object objectValue1 = propertyBean.getProperty(object1, property);
-							Object objectValue2 = propertyBean.getProperty(object2, property);
-							
-							if (isDifferentObjects(objectValue1, objectValue2)) {
-								differentPropertyList.add(property);
-							}
+				for (String property : properties) {
+					if (property.equals(desc.getName())) {
+						Object objectValue1 = propertyBean.getProperty(object1, property);
+						Object objectValue2 = propertyBean.getProperty(object2, property);
+
+						if (isDifferentObjects(objectValue1, objectValue2)) {
+							return true;
 						}
 					}
-				}
-			}
-			return differentPropertyList;
-		}
-		catch (IllegalAccessException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} catch (InvocationTargetException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} catch (NoSuchMethodException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} 
-	}
-	
-	private boolean isDifferentObjects(Object object1, Object object2){
-		try {
-			if ((object1 == null && object2 != null)) {
-				return isEmpty(object2);
-			}
-			if ((object1 != null && object2 == null)) {
-				return isEmpty(object1);
-			}
-			
-			if (object1 != null && object2 != null) {
-				//Primitive
-				if (isPrimitive(object1)) {
-					if (!object1.equals(object2))
-						return true; 
-				}
-				
-				//Collection 
-				if (object1 instanceof Collection) {
-					if (isDifferentForCollection((Collection)object1, (Collection)object2))
-						return true;
-				}
-				
-				//Map
-				if (object1 instanceof Map) {
-					if (isDifferentForMap((Map)object1, (Map)object2))
-						return true;
-				}
-				
-				//Object
-				PropertyDescriptor[] targetPds = propertyBean.getPropertyDescriptors(object1.getClass());
-				for (PropertyDescriptor desc : targetPds) {
-					if (desc.getName().equals("class") || desc.getName().equals("declaringClass"))
-						continue;
-					
-					Object objectValue1 = propertyBean.getProperty(object1, desc.getName());
-					Object objectValue2 = propertyBean.getProperty(object2, desc.getName());
-				
-					if (isDifferentObjects(objectValue1, objectValue2))
-						return true;
 				}
 			}
 			return false;
 		}
-		catch (IllegalAccessException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} catch (InvocationTargetException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} catch (NoSuchMethodException e) {
-			throw new NaraException("ObjectDiffer Fail");
-		} 
+	}
+
+	public List<String> getDifferences() throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		//
+		List<String> differentPropertyList = new ArrayList<String>();
+
+		if (object1 == null || object2 == null)
+			throw new IllegalArgumentException("The object must not be null");
+
+		if (object1.getClass()  != object2.getClass())
+			throw new IllegalArgumentException("The objects type must same");
+
+		if (isPrimitive(object1))
+			throw new IllegalArgumentException("The objects type must not be primitive");
+
+		PropertyDescriptor[] targetPds = propertyBean.getPropertyDescriptors(object1.getClass());
+
+		for (PropertyDescriptor desc : targetPds) {
+			if (desc.getName().equals("class") || desc.getName().equals("declaringClass"))
+				continue;
+			//ã�����ϴ� property�� ���ξ�����
+			if (properties == null || properties.isEmpty()) {
+				Object objectValue1 = propertyBean.getProperty(object1, desc.getName());
+				Object objectValue2 = propertyBean.getProperty(object2, desc.getName());
+
+				if (isDifferentObjects(objectValue1, objectValue2)) {
+					differentPropertyList.add(desc.getName());
+				}
+			}
+			// ���� ������
+			else {
+				for (String property : properties) {
+					if (property.equals(desc.getName())) {
+						Object objectValue1 = propertyBean.getProperty(object1, property);
+						Object objectValue2 = propertyBean.getProperty(object2, property);
+
+						if (isDifferentObjects(objectValue1, objectValue2)) {
+							differentPropertyList.add(property);
+						}
+					}
+				}
+			}
+		}
+		return differentPropertyList;
+	}
+	
+	private boolean isDifferentObjects(Object object1, Object object2) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+		//
+		if ((object1 == null && object2 != null)) {
+			return isEmpty(object2);
+		}
+		if ((object1 != null && object2 == null)) {
+			return isEmpty(object1);
+		}
+
+		if (object1 != null && object2 != null) {
+			//Primitive
+			if (isPrimitive(object1)) {
+				if (!object1.equals(object2))
+					return true;
+			}
+
+			//Collection
+			if (object1 instanceof Collection) {
+				if (isDifferentForCollection((Collection)object1, (Collection)object2))
+					return true;
+			}
+
+			//Map
+			if (object1 instanceof Map) {
+				if (isDifferentForMap((Map)object1, (Map)object2))
+					return true;
+			}
+
+			//Object
+			PropertyDescriptor[] targetPds = propertyBean.getPropertyDescriptors(object1.getClass());
+			for (PropertyDescriptor desc : targetPds) {
+				if (desc.getName().equals("class") || desc.getName().equals("declaringClass"))
+					continue;
+
+				Object objectValue1 = propertyBean.getProperty(object1, desc.getName());
+				Object objectValue2 = propertyBean.getProperty(object2, desc.getName());
+
+				if (isDifferentObjects(objectValue1, objectValue2))
+					return true;
+			}
+		}
+		return false;
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	private boolean isDifferentForCollection(Collection collection, Collection collection2)  {
+	private boolean isDifferentForCollection(Collection collection, Collection collection2) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
 		if ((collection == null)) {
 			if (collection2 != null && !collection2.isEmpty()) {
 				return true;
@@ -248,7 +217,7 @@ public class ObjectDiffer {
 	}
 	
     @SuppressWarnings({ "rawtypes" })
-	private boolean isDifferentForMap(Map map1, Map map2) {
+	private boolean isDifferentForMap(Map map1, Map map2) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException{
 		if ((map1 == null)) {
 			if (map2 != null && !map2.isEmpty()) {
 				return true;

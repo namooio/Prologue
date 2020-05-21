@@ -23,8 +23,12 @@ public class Offset implements JsonSerializable {
     public Offset(int offset,
                   int limit) {
         //
+        if(limit < 0) {
+            throw new IllegalArgumentException("Limit value should be plus: " + limit);
+        }
+
         this.offset = offset;
-        this.limit = limit > 0 ? limit : 10;
+        this.limit = limit;
     }
 
     public static Offset newDefault() {
@@ -32,7 +36,7 @@ public class Offset implements JsonSerializable {
         return new Offset(0, 10);
     }
 
-    public static Offset newOne(int offset, int limit) {
+    public static Offset newInstance(int offset, int limit) {
         //
         return new Offset(offset, limit);
     }
@@ -67,9 +71,14 @@ public class Offset implements JsonSerializable {
         return (offset/limit);
     }
 
-    public int sum() {
+    public int nextOffsetValue() {
         //
         return offset + limit;
+    }
+
+    public Offset nextOffset() {
+        //
+        return new Offset(nextOffsetValue(), limit);
     }
 
     public static void main(String[] args) {

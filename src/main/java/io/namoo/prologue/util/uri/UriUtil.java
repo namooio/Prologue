@@ -1,15 +1,13 @@
 /*
- * COPYRIGHT (c) NEXTREE Consulting 2014
- * This software is the proprietary of NEXTREE Consulting CO.
+ * COPYRIGHT (c) NEXTREE 2014
+ * This software is the proprietary of NEXTREE CO.
  * @since 2014. 6. 10.
  */
 
 package io.namoo.prologue.util.uri;
 
-
 public class UriUtil {
     //
-    // TODO RegExpression
     public static boolean match(String uri, String pattern) {
         //
         if (pattern == null || uri == null) return false;
@@ -56,7 +54,7 @@ public class UriUtil {
     }
 
     public static void main(String[] args) {
-
+        //
         String uri = "board-api/boards/17-0001-001/postings/17-0001-001-0002/replies/";
         String pattern = "/board-api/boards/{boardId}/postings/{postingId}/replies";
         String pattern2 = "/board-api/boards/%s/postings/%s/replies";

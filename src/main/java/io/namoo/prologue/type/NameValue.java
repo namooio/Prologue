@@ -8,6 +8,7 @@ package io.namoo.prologue.type;
 
 import io.namoo.prologue.util.json.JsonSerializable;
 import io.namoo.prologue.util.json.JsonUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,26 +19,26 @@ import java.util.StringTokenizer;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class NameValue implements JsonSerializable {
     //
     private String name;
     private String value;
 
-    public NameValue(String name, String value) {
+    public static NameValue newInstance(String name, String value) {
         //
-        this.setName(name);
-        this.setValue(value);
-    }
-
-    public static NameValue fromJson(String json) {
-        //
-        return JsonUtil.fromJson(json, NameValue.class);
+        return new NameValue(name, value);
     }
 
     @Override
     public String toString() {
         //
         return toJson();
+    }
+
+    public static NameValue fromJson(String json) {
+        //
+        return JsonUtil.fromJson(json, NameValue.class);
     }
 
     @Override

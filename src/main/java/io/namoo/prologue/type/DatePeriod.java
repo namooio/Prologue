@@ -6,6 +6,7 @@
 
 package io.namoo.prologue.type;
 
+import io.grpc.netty.shaded.io.netty.channel.local.LocalChannel;
 import io.namoo.prologue.util.date.DateFormatUtil;
 import io.namoo.prologue.util.date.DateUtil;
 import io.namoo.prologue.util.json.JsonSerializable;
@@ -19,6 +20,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.zone.ZoneRulesException;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -35,14 +38,14 @@ public class DatePeriod implements JsonSerializable, Serializable {
         //
         this.zoneId = ZoneId.systemDefault().getId();
         this.startDate = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
-        this.endDate = null;
+        this.endDate =  LocalDate.now().plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE);;
     }
 
     public DatePeriod(LocalDate startDate) {
         //
         this.zoneId = ZoneId.systemDefault().getId();
         this.startDate = startDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-        this.endDate = null;
+        this.endDate = startDate.plusDays(1).format(DateTimeFormatter.ISO_LOCAL_DATE);;
     }
 
     public DatePeriod(LocalDate startDate, LocalDate endDate) {
@@ -70,6 +73,24 @@ public class DatePeriod implements JsonSerializable, Serializable {
 
     public DatePeriod(String zoneId, String startDate, String endDate) {
         //
+        try {
+            ZoneId.of(zoneId);
+        } catch (ZoneRulesException e) {
+            throw new IllegalArgumentException("Zone id is not valid: " + zoneId);
+        }
+
+        try {
+            LocalDate.parse(startDate);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("ISO_LOCAL_DATE format error: " + startDate);
+        }
+
+        try {
+            LocalDate.parse(endDate);
+        } catch(DateTimeParseException e) {
+            throw new IllegalArgumentException("ISO_LOCAL_DATE format error: " + endDate);
+        }
+
         this.zoneId = zoneId;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -85,6 +106,13 @@ public class DatePeriod implements JsonSerializable, Serializable {
     public DatePeriod(String startDateStr, int days) {
         //
         this.zoneId = ZoneId.systemDefault().getId();
+
+        try {
+            LocalDate.parse(startDate);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("ISO_LOCAL_DATE format error: " + startDate);
+        }
+
         this.startDate = startDateStr;
         LocalDate start = LocalDate.parse(startDateStr);
         this.endDate = start.plusDays(days).format(DateTimeFormatter.ISO_LOCAL_DATE);
@@ -92,9 +120,7 @@ public class DatePeriod implements JsonSerializable, Serializable {
 
     public DatePeriod(String startDate, String endDate) {
         //
-        this.zoneId = ZoneId.systemDefault().getId();
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this(ZoneId.systemDefault().getId(), startDate, endDate);
     }
 
     @Override
@@ -188,18 +214,6 @@ public class DatePeriod implements JsonSerializable, Serializable {
         LocalDate end = LocalDate.parse(endDate);
 
         return (start.isEqual(date) || start.isBefore(date)) && (end.isEqual(date) || end.isAfter(date));
-    }
-
-    public boolean isValid() {
-        //
-        if (!ZoneId.getAvailableZoneIds().contains(zoneId)) return false;
-        try {
-            DateUtil.parseDate(startDate, DateFormatUtil.ISO_DATE_FORMAT.getPattern());
-            DateUtil.parseDate(endDate, DateFormatUtil.ISO_DATE_FORMAT.getPattern());
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
     }
 
     @Override

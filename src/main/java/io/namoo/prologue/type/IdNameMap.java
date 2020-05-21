@@ -56,13 +56,13 @@ public class IdNameMap implements JsonSerializable {
         return new IdNameMap(IdName.sample());
     }
 
-	public IdNameMap add(IdName idName) {
+	public IdNameMap put(IdName idName) {
 		//
 		idNameMap.put(idName.getId(), idName.getName());
 		return this;
 	}
 
-	public IdNameMap add(String id, String name) {
+	public IdNameMap put(String id, String name) {
 		//
 		idNameMap.put(id, name);
 		return this;
@@ -77,7 +77,7 @@ public class IdNameMap implements JsonSerializable {
 
 	public List<IdName> list() {
 		//
-		List<IdName> idNames = new ArrayList<>();
+		List<IdName> idNames = new ArrayList<>(idNameMap.size());
 		Iterator<String> keyIterator = idNameMap.keySet().iterator();
 		while(keyIterator.hasNext()) {
 			String key = keyIterator.next();

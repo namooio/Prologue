@@ -39,7 +39,7 @@ public class NameValueList implements JsonSerializable {
 
 	public NameValueList(NameValueList nameValues) {
 		//
-		this();
+		this.nameValues = new ArrayList<>(nameValues.size());
 		this.nameValues.addAll(nameValues.list());
 	}
 
@@ -47,6 +47,11 @@ public class NameValueList implements JsonSerializable {
 	    //
         return new NameValueList(name, value);
     }
+
+    public static NameValueList newInstance(NameValue nameValue) {
+		//
+		return new NameValueList(nameValue);
+	}
 
     public static NameValueList newEmptyInstance() {
 		//
@@ -57,11 +62,6 @@ public class NameValueList implements JsonSerializable {
 	public String toString() {
 		//
 		return toJson();
-	}
-
-	public static NameValueList sample() {
-		//
-		return new NameValueList("name", "Cheolsoo Kim");
 	}
 
 	public static NameValueList fromJson(String json) {
@@ -136,6 +136,11 @@ public class NameValueList implements JsonSerializable {
 
 	public int size() {
 		return nameValues.size();
+	}
+
+	public static NameValueList sample() {
+		//
+		return new NameValueList("name", "Cheolsoo Kim");
 	}
 
 	public static void main(String[] args) {

@@ -8,6 +8,7 @@ package io.namoo.prologue.type;
 
 import io.namoo.prologue.ddd.ValueObject;
 import io.namoo.prologue.util.json.JsonUtil;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +20,7 @@ import java.util.StringTokenizer;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class IdName implements ValueObject, Serializable {
     //
     private static final long serialVersionUID = 253022376813035322L;
@@ -26,10 +28,9 @@ public class IdName implements ValueObject, Serializable {
     private String id;
     private String name;
 
-    public IdName(String id, String name) {
+    public static IdName newInstance(String id, String name) {
         //
-        this.id = id;
-        this.name = name;
+        return new IdName(id, name);
     }
 
     public String toString() {
@@ -39,7 +40,7 @@ public class IdName implements ValueObject, Serializable {
 
     public String toSimpleString() {
         //
-        return id + ":" + name;
+        return String.format("%s:%s", id, name);
     }
 
     public static IdName fromSimpleString(String idNameStr) {

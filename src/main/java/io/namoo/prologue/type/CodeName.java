@@ -7,6 +7,7 @@
 package io.namoo.prologue.type;
 
 import io.namoo.prologue.ddd.ValueObject;
+import io.namoo.prologue.util.json.JsonSerializable;
 import io.namoo.prologue.util.json.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,10 +21,15 @@ import java.util.StringTokenizer;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CodeName implements ValueObject {
+public class CodeName implements JsonSerializable {
     //
     private String code;
     private String name;
+
+    public static CodeName newInstance(String code, String name) {
+        //
+        return new CodeName(code, name);
+    }
 
     public String toString() {
         //
@@ -32,7 +38,7 @@ public class CodeName implements ValueObject {
 
     public String toSimpleString() {
         //
-        return code + ":" + name;
+        return String.format("%s:%s", code, name);
     }
 
     public static CodeName fromSimpleString(String codeNameStr) {
@@ -82,5 +88,8 @@ public class CodeName implements ValueObject {
         //
         System.out.println(sample());
         System.out.println(CodeName.fromSimpleString(sample().toSimpleString()));
+        CodeName codeName = new CodeName("11", null);
+        System.out.println(codeName.toString());
+        System.out.println(codeName.toSimpleString());
     }
 }

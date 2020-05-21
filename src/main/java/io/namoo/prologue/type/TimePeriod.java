@@ -10,54 +10,67 @@ import io.namoo.prologue.util.json.JsonSerializable;
 import io.namoo.prologue.util.json.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.text.SimpleDateFormat;
 import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.zone.ZoneRulesException;
 import java.util.Calendar;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class TimePeriod implements JsonSerializable {
     //
     private static String DEFAULT_TIME_FORMAT = "HH:mm:ss";
 
     private String zoneId;
-    private Long startTime;
-    private Long endTime;
+    private String startTime;
+    private String endTime;
 
     public TimePeriod() {
         //
         this.zoneId = ZoneId.systemDefault().getId();
-        this.startTime = System.currentTimeMillis();
-        this.endTime = null;
-    }
-
-    public TimePeriod(long startTime, long endTime) {
-        //
-        this.zoneId = ZoneId.systemDefault().getId();
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
-    public TimePeriod(ZonedDateTime startTime, ZonedDateTime endTime) {
-        //
-        this.zoneId = startTime.getZone().getId();
-        this.startTime = startTime.toInstant().toEpochMilli();
-        this.endTime = endTime.toInstant().toEpochMilli();
+        this.startTime = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME);
+        this.endTime = LocalDateTime.now().plusHours(1).format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
     public TimePeriod(LocalDateTime startTime, LocalDateTime endTime) {
         //
         this.zoneId = ZoneId.systemDefault().getId();
-        this.startTime = startTime.atZone(ZoneId.of(zoneId)).toInstant().toEpochMilli();
-        this.endTime = endTime.atZone(ZoneId.of(zoneId)).toInstant().toEpochMilli();
+        this.startTime = startTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
+        this.endTime = startTime.format(DateTimeFormatter.ISO_LOCAL_TIME);
     }
 
-    public TimePeriod(long startTime) {
+    public TimePeriod(String startTime, String endTime) {
         //
-        this(startTime, 0L);
+        this(ZoneId.systemDefault().getId(), startTime, endTime);
+    }
+
+    public TimePeriod(String zoneId, String startTime, String endTime) {
+        //
+        try {
+            ZoneId.of(zoneId);
+            this.zoneId = zoneId;
+        } catch (ZoneRulesException e) {
+            throw new IllegalArgumentException("Invalid zone id: " + zoneId);
+        }
+
+        try {
+            LocalDateTime.parse(startTime);
+            this.startTime = startTime;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid time format: " + startTime);
+        }
+
+        try {
+            LocalDateTime.parse(endTime);
+            this.endTime = endTime;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid time format: " + endTime);
+        }
     }
 
     public String toString() {
@@ -67,7 +80,7 @@ public class TimePeriod implements JsonSerializable {
 
     public String toSimpleString() {
         //
-        return String.format("StartTime[%s], EndTime[%s]", getStartTimeString(), getEndTimeString());
+        return String.format("%s:%s", startTime, endTime);
     }
 
     public static TimePeriod fromJson(String json) {
@@ -77,51 +90,12 @@ public class TimePeriod implements JsonSerializable {
 
     public static TimePeriod sample() {
         //
-        return new TimePeriod(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC),
-            LocalDateTime.now().plusDays(10).toEpochSecond(ZoneOffset.UTC));
+        return new TimePeriod();
     }
 
     public LocalDateTime getStartLocalDateTime() {
         //
-        return Instant.ofEpochMilli(startTime)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime();
-    }
-
-    public ZonedDateTime getStartZonedDateTime() {
-        //
-        return Instant.ofEpochMilli(startTime)
-            .atZone(ZoneId.systemDefault());
-    }
-
-    public LocalDateTime getEndLocalDateTime() {
-        //
-        return Instant.ofEpochMilli(endTime)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime();
-    }
-
-    public ZonedDateTime getEndZonedDateTime() {
-        //
-        return Instant.ofEpochMilli(endTime)
-            .atZone(ZoneId.systemDefault());
-    }
-
-    public String getStartTimeString() {
-        //
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(startTime);
-        return  new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(cal.getTime());
-    }
-
-    public String getEndTimeString() {
-        //
-        if (endTime == null || endTime == 0L) {
-            return "00:00:00";
-        }
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(startTime);
-        return  new SimpleDateFormat(DEFAULT_TIME_FORMAT).format(cal.getTime());
+        return LocalDateTime.parse(startTime);
     }
 
     public static void main(String[] args) {

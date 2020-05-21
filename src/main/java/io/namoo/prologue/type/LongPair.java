@@ -83,6 +83,11 @@ public class LongPair implements JsonSerializable {
         right--;
     }
 
+    public long gap() {
+        //
+        return right - left;
+    }
+
     public static void main(String[] args) {
         //
         System.out.println(sample());

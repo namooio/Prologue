@@ -41,7 +41,7 @@ public abstract class DomainEntity implements JsonSerializable, Serializable {
 
 	public IdName genEntityIdName() {
 		//
-		return new IdName(this.id, this.getClass().getSimpleName());
+		return IdName.newInstance(this.id, this.getClass().getSimpleName());
 	}
 
 	public boolean equals(Object target) {
@@ -57,6 +57,15 @@ public abstract class DomainEntity implements JsonSerializable, Serializable {
 		DomainEntity entity = (DomainEntity) target;
 
 		return Objects.equals(id, entity.id);
+	}
+
+	public boolean equalsVersion(DomainEntity entity) {
+		//
+		if(!equals(entity)) {
+			return false;
+		}
+
+		return Objects.equals(entityVersion, entity.entityVersion);
 	}
 
 	public int hashCode() {

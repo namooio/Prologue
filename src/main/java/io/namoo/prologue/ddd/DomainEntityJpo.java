@@ -52,6 +52,15 @@ public abstract class DomainEntityJpo implements JsonSerializable {
         }
     }
 
+    public boolean equalsVersion(DomainEntityJpo domainEntityJpo) {
+        //
+        if(!this.equals(domainEntityJpo)) {
+            return false;
+        }
+
+        return Objects.equals(this.entityVersion, domainEntityJpo.entityVersion);
+    }
+
     @Override
     public int hashCode() {
         //
@@ -61,5 +70,10 @@ public abstract class DomainEntityJpo implements JsonSerializable {
     public String toString(){
         //
         return toJson();
+    }
+
+    public String toPrettyString() {
+        //
+        return toPrettyJson();
     }
 }
